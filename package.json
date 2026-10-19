@@ -47,5 +47,16 @@
   "homepage": "https://zkdle.fun",
   "engines": {
     "node": ">=20"
+  },
+  "overrides": {
+    "rpc-websockets": {
+      "ws": "^8.22.0"
+    },
+    "@ethersproject/providers": {
+      "ws": "^8.22.0"
+    },
+    "isomorphic-ws": {
+      "ws": "^8.22.0"
+    }
   }
 }

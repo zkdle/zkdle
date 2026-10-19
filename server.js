@@ -28,9 +28,11 @@ async function tokProgram() {
     const m = await conn.getAccountInfo(new PublicKey(cfg.token.mint));
     if (!m) throw new Nope('token mint not found');
     tokenProgram = m.owner;
+    if (m.data[44] !== cfg.token.decimals) { console.warn(`token decimals: mint has ${m.data[44]}, config said ${cfg.token.decimals}; using the mint's`); cfg.token.decimals = m.data[44]; }
   }
   return tokenProgram;
 }
+if (cfg.token.mint) tokProgram().then((tp) => console.log('token program', tp.toBase58(), 'decimals', cfg.token.decimals)).catch((e) => console.warn('token mint check:', e.message));
 const rawUnits = (ui) => BigInt(Math.round(ui * 10 ** cfg.token.decimals));
 const dayNow = () => Math.floor((Date.now() - EPOCH) / 864e5);
 
@@ -51,6 +53,9 @@ function save() {
   const tmp = cfg.db + '.tmp';
   fs.writeFileSync(tmp, dbKey ? vault.seal(dbKey, db) : JSON.stringify(db), { mode: 0o600 });
   fs.renameSync(tmp, cfg.db);
+  // one rolling copy per weekday next to the db (same disk, still encrypted): a bad write never costs more than a day
+  const slot = new Date().getUTCDay();
+  if (save.slot !== slot) { save.slot = slot; try { fs.copyFileSync(cfg.db, `${cfg.db}.bak${slot}`); } catch (e) { console.warn('db backup:', e.message); } }
 }
 
 // ---------------------------------------------------------------- helpers
@@ -235,7 +240,15 @@ async function tick() {
       }
     }
     // Bounty rounds are paid in $PROOF, so they only run once the token is live.
-    if (cfg.token.mint && cfg.treasury && !Object.values(db.rounds).some((r) => r.kind === 0 && !r.settled && r.endsAt > Date.now() + 60e3)) {
+    // Host wallet pays the daily seal, round rent (refunded on close) and fees; shout in the logs well before it runs dry.
+    if (!tick.balAt || Date.now() - tick.balAt > 3600e3) {
+      tick.balAt = Date.now();
+      const bal = await conn.getBalance(host.publicKey).catch(() => null);
+      if (bal != null && bal < cfg.hostLowLamports) console.warn(`HOST LOW BALANCE: ${(bal / 1e9).toFixed(4)} SOL left on ${host.publicKey.toBase58()} — top it up`);
+    }
+    // Never open on the fallback entry: wait until the TWAP has enough fresh samples (a few minutes after boot).
+    if (pricer && !pricer.twap()) { if (!tick.warned) console.warn('bounty: waiting for a $PROOF price (TWAP) before opening a round'); tick.warned = true; }
+    else if (cfg.token.mint && cfg.treasury && !Object.values(db.rounds).some((r) => r.kind === 0 && !r.settled && r.endsAt > Date.now() + 60e3)) {
       await openBounty();
     }
     for (const r of Object.values(db.rounds)) await maybeSettle(r).catch((e) => console.warn('settle', r.id, scrub(e)));
@@ -299,12 +312,14 @@ const app = express();
 app.disable('x-powered-by');
 app.use(require('compression')());
 app.use(express.json({ limit: '64kb' }));
-app.use((req, res, next) => { res.set({ 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin' }); next(); });
+app.use((req, res, next) => { res.set({ 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'x-frame-options': 'DENY', 'permissions-policy': 'camera=(), microphone=(), geolocation=()', ...(cfg.network === 'Mainnet' ? { 'strict-transport-security': 'max-age=15552000' } : {}) }); next(); });
 const route = (fn) => async (req, res) => {
   // prover queue full -> 429 so clients back off and retry
   try { await fn(req, res); } catch (e) { res.status(e.status || 400).json({ error: publicError(e) }); }
 };
-const clientIp = (req) => String(req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
+// Rate-limit key. The leftmost X-Forwarded-For entry is whatever the client typed, so it can't be the key:
+// prefer Cloudflare's CF-Connecting-IP (overwritten at the edge), else the last hop the proxy (Render) appended.
+const clientIp = (req) => String(req.headers['cf-connecting-ip'] || String(req.headers['x-forwarded-for'] || '').split(',').map((s) => s.trim()).filter(Boolean).pop() || req.ip || '').trim();
 function bucket(perMinute) {
   const seen = new Map();
   setInterval(() => seen.clear(), 60e3).unref();
@@ -381,7 +396,7 @@ app.post('/api/streak/mend', bucket(10), walletBucket, route(async (req, res) =>
   if (!s) throw new Nope('no streak yet');
   const st = readStreak(s);
   if (st.lastDay !== dayNow() - 2) throw new Nope('repair bridges exactly one missed day');
-  const program = cfg.token.program === 'token2022' ? spl.TOKEN22 : spl.TOKEN;
+  const program = await tokProgram(); // Token or Token-2022, from the mint itself (pump.fun coins are Token-2022)
   const raw = BigInt(Math.round(cfg.token.mend * 10 ** cfg.token.decimals));
   const burnIx = spl.burn(spl.ataOf(wallet, cfg.token.mint, program), cfg.token.mint, wallet, raw, cfg.token.decimals, program);
   res.json({ tx: await forPlayer(wallet, [burnIx, prog.mend(wallet, host.publicKey)]) });

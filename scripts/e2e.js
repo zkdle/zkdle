@@ -7,12 +7,41 @@ const os = require('os');
 const path = require('path');
 const assert = require('assert');
 const web3 = require('@solana/web3.js');
-const splt = require('@solana/spl-token');
+const splt0 = require('@solana/spl-token');
+// ZK_E2E_TOKEN22=1 runs the whole suite with a pump.fun-style $PROOF: Token-2022 mint carrying MetadataPointer +
+// TokenMetadata extensions (what pump.fun's create_v2 mints look like). The mock wSOL side stays legacy SPL Token.
+const T22 = process.env.ZK_E2E_TOKEN22 === '1';
+const t22 = new Set();
+const pidOf = (m) => (t22.has(new web3.PublicKey(m).toBase58()) ? splt0.TOKEN_2022_PROGRAM_ID : splt0.TOKEN_PROGRAM_ID);
+const splt = {
+  async createMint(conn, payer, auth, freeze, dec, opts = {}) {
+    if (!(T22 && opts.proof)) return splt0.createMint(conn, payer, auth, freeze, dec);
+    const kp = web3.Keypair.generate(), P = splt0.TOKEN_2022_PROGRAM_ID;
+    const meta = { mint: kp.publicKey, name: 'ZKdle Proof', symbol: 'PROOF', uri: 'https://zkdle.fun/token.json', additionalMetadata: [] };
+    const len = splt0.getMintLen([splt0.ExtensionType.MetadataPointer]);
+    const full = len + splt0.TYPE_SIZE + splt0.LENGTH_SIZE + require('@solana/spl-token-metadata').pack(meta).length;
+    const tx = new web3.Transaction().add(
+      web3.SystemProgram.createAccount({ fromPubkey: payer.publicKey, newAccountPubkey: kp.publicKey, space: len, lamports: await conn.getMinimumBalanceForRentExemption(full), programId: P }),
+      splt0.createInitializeMetadataPointerInstruction(kp.publicKey, auth, kp.publicKey, P),
+      splt0.createInitializeMintInstruction(kp.publicKey, dec, auth, freeze, P),
+      require('@solana/spl-token-metadata').createInitializeInstruction({ programId: P, metadata: kp.publicKey, updateAuthority: auth, mint: kp.publicKey, mintAuthority: auth, name: meta.name, symbol: meta.symbol, uri: meta.uri }));
+    await web3.sendAndConfirmTransaction(conn, tx, [payer, kp]);
+    t22.add(kp.publicKey.toBase58());
+    return kp.publicKey;
+  },
+  createAccount: (conn, payer, mint, owner, kp) => splt0.createAccount(conn, payer, mint, owner, kp, undefined, pidOf(mint)),
+  mintTo: (conn, payer, mint, dest, auth, amt) => splt0.mintTo(conn, payer, mint, dest, auth, amt, [], undefined, pidOf(mint)),
+  getAssociatedTokenAddressSync: (mint, owner, off = false) => splt0.getAssociatedTokenAddressSync(mint, owner, off, pidOf(mint)),
+  getOrCreateAssociatedTokenAccount: (conn, payer, mint, owner, off = false) => splt0.getOrCreateAssociatedTokenAccount(conn, payer, mint, owner, off, undefined, undefined, pidOf(mint)),
+  getMint: (conn, mint) => splt0.getMint(conn, mint, undefined, pidOf(mint)),
+  async getAccount(conn, addr) { const i = await conn.getAccountInfo(addr); return splt0.getAccount(conn, addr, undefined, i ? i.owner : splt0.TOKEN_PROGRAM_ID); },
+  async transfer(conn, payer, from, to, owner, amt) { const a = await splt.getAccount(conn, from); const m = await splt.getMint(conn, a.mint); return splt0.transferChecked(conn, payer, from, a.mint, to, owner, amt, m.decimals, [], undefined, pidOf(a.mint)); },
+};
 const { client, readCard, readStreak, readRound } = require('../lib/sdk');
 const spl = require('../lib/spl');
 
 const ROOT = path.join(__dirname, '..');
-const SO = path.join(ROOT, 'program/target/deploy/zkdle.so');
+const SO = process.env.ZK_E2E_SO || path.join(ROOT, 'program/target/deploy/zkdle.so'); // ZK_E2E_SO=/path/verified.so to test the exact on-chain build
 const RPC_PORT = 8939, PORT = 5391, RPC = `http://127.0.0.1:${RPC_PORT}`, API = `http://127.0.0.1:${PORT}`;
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'zkdle-e2e-'));
 const kids = [];
@@ -66,7 +95,9 @@ async function main() {
   });
 
   // $PROOF stand-in (6 decimals) + a mock AMM pool whose two reserve accounts the server prices from.
-  const mint = await splt.createMint(conn, host, host.publicKey, null, 6);
+  const mint = await splt.createMint(conn, host, host.publicKey, null, 6, { proof: true });
+  const TPX = pidOf(mint); // the $PROOF token program (Token or Token-2022)
+  console.log('  $PROOF test mint on', TPX.toBase58());
   const solMint = await splt.createMint(conn, host, host.publicKey, null, 9);
   const poolOwner = web3.Keypair.generate();
   const poolTok = await splt.createAccount(conn, host, mint, poolOwner.publicKey, web3.Keypair.generate());
@@ -176,7 +207,7 @@ async function main() {
   });
   await step('bounty: a seat without the host co-signature is refused', async () => {
     const X = players[4];
-    const tok = { playerTa: ataOf(X), mint, vault, treasuryTa: tTa, program: spl.TOKEN };
+    const tok = { playerTa: ataOf(X), mint, vault, treasuryTa: tTa, program: TPX };
     await rejects(send([prog.join(X.publicKey, host.publicKey, rid, Buffer.alloc(32, 7), tok)], [X]), 'missing host sig');
   });
   const playSeat = async (round, p, misses) => {
@@ -198,7 +229,7 @@ async function main() {
   await step('bounty: the server rations proofs (no 7th guess)', async () => {
     await rejects(api(`/api/rounds/${rid}/guess`, { wallet: bounty[3].publicKey.toBase58(), guess: 'crane' }), '7th guess');
   });
-  const tokFor = { vault, mint, program: spl.TOKEN, dest: (k) => splt.getAssociatedTokenAddressSync(mint, new web3.PublicKey(k)) };
+  const tokFor = { vault, mint, program: TPX, dest: (k) => splt.getAssociatedTokenAddressSync(mint, new web3.PublicKey(k)) };
   await step('security: nothing public leaks a live answer, salt or seed before reveal', async () => {
     const sec = await api('/api/test/secrets');
     const live = sec.rounds.find((r) => r.id === rid);
@@ -283,7 +314,7 @@ async function main() {
     const { id: r3 } = await api('/api/test/round', { secs: 300, cap: 12 });
     for (const p of twelve) { const { tx } = await api(`/api/rounds/${r3}/join`, { wallet: p.publicKey.toBase58() }); await signAndSend(tx, p); await api(`/api/rounds/${r3}/seated`, { wallet: p.publicKey.toBase58() }); }
     const v3 = splt.getAssociatedTokenAddressSync(mint, prog.at.round(r3), true);
-    const tok3 = { vault: v3, mint, program: spl.TOKEN, dest: (k) => splt.getAssociatedTokenAddressSync(mint, new web3.PublicKey(k)) };
+    const tok3 = { vault: v3, mint, program: TPX, dest: (k) => splt.getAssociatedTokenAddressSync(mint, new web3.PublicKey(k)) };
     const probe = new web3.Transaction().add(web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }), prog.settle(r3, treasury.publicKey, twelve.map((k) => k.publicKey), tok3));
     probe.feePayer = host.publicKey; probe.recentBlockhash = (await conn.getLatestBlockhash()).blockhash; probe.sign(host);
     const size = probe.serialize().length;
@@ -347,11 +378,18 @@ async function main() {
     const ata = { address: ataOf(A) };
     const t0 = await tokBal(ata.address);
     const s0 = readStreak((await conn.getAccountInfo(prog.at.streak(A.publicKey))).data);
-    await send([spl.burn(ata.address, mint, A.publicKey, 500e6, 6), prog.mend(A.publicKey, host.publicKey)], [A, host]);
+    await send([spl.burn(ata.address, mint, A.publicKey, 500e6, 6, TPX), prog.mend(A.publicKey, host.publicKey)], [A, host]);
     const s1 = readStreak((await conn.getAccountInfo(prog.at.streak(A.publicKey))).data);
     assert.equal(s1.lastDay, s0.lastDay + 1); assert.equal(s1.mends, 1);
     assert.equal(t0 - (await tokBal(ata.address)), 500e6);
     await rejects(send([prog.mend(A.publicKey, players[3].publicKey)], [A, players[3]]), 'mend without host');
+  });
+
+  await step('holder badge: 100,000 $PROOF threshold read from the chain (works for Token and Token-2022)', async () => {
+    const rich = web3.Keypair.generate(), poor = web3.Keypair.generate();
+    for (const [k, amt] of [[rich, 100_000e6], [poor, 99_999e6]]) { const a = await splt.getOrCreateAssociatedTokenAccount(conn, host, mint, k.publicKey); await splt.mintTo(conn, host, mint, a.address, host, amt); }
+    assert.equal((await api(`/api/player/${rich.publicKey.toBase58()}`)).holder, true);
+    assert.equal((await api(`/api/player/${poor.publicKey.toBase58()}`)).holder, false);
   });
 
 
@@ -364,11 +402,11 @@ async function main() {
     const id = nextRid++, seed = crypto.randomBytes(32);
     const tokO = kind === 0 ? { mint, burnBps: 1000, refLamports: 0 } : undefined;
     await send([prog.openRound(host.publicKey, host.publicKey, { id, entry: entryRaw, cap, secs, commit: wordsLib.sha256(seed), kind, tok: tokO }),
-      ...(kind === 0 ? [spl.createAta(host.publicKey, prog.at.round(id), mint, spl.TOKEN)] : [])], [host]);
+      ...(kind === 0 ? [spl.createAta(host.publicKey, prog.at.round(id), mint, TPX)] : [])], [host]);
     return { id, seed, vault: splt.getAssociatedTokenAddressSync(mint, prog.at.round(id), true) };
   };
   const seatOf = async (R, p) => { const { word, salt } = wordsLib.seatWord(R.seed.toString('hex'), R.id, p.publicKey.toBase58()); return { word, salt, seal: await zk.seal(word, salt) }; };
-  const joinIx = (R, p, seal, kind = 0) => prog.join(p.publicKey, host.publicKey, R.id, zk.be32(seal), kind === 0 ? { playerTa: ataOf(p), mint, vault: R.vault, treasuryTa: tTa, program: spl.TOKEN } : undefined);
+  const joinIx = (R, p, seal, kind = 0) => prog.join(p.publicKey, host.publicKey, R.id, zk.be32(seal), kind === 0 ? { playerTa: ataOf(p), mint, vault: R.vault, treasuryTa: tTa, program: TPX } : undefined);
   const guessIx = async (R, p, s, g, sealOverride) => {
     const { proof, clue } = await zk.prove(s.word, s.salt, g, sealOverride || s.seal);
     return prog.guess(p.publicKey, prog.at.round(R.id), { letters: Buffer.from(zk.letters(g)), clue: Buffer.from(clue), proof: zk.chainProof(proof) });
@@ -379,7 +417,7 @@ async function main() {
     for (const k of ks) { const a = await splt.getOrCreateAssociatedTokenAccount(conn, host, mint, k.publicKey); if (tokens) await splt.mintTo(conn, host, mint, a.address, host, tokens); }
     return ks;
   };
-  const tokB = (R) => ({ vault: R.vault, mint, program: spl.TOKEN, dest: (k) => splt.getAssociatedTokenAddressSync(mint, new web3.PublicKey(k)) });
+  const tokB = (R) => ({ vault: R.vault, mint, program: TPX, dest: (k) => splt.getAssociatedTokenAddressSync(mint, new web3.PublicKey(k)) });
 
   const [E1, E2] = await fresh(2);
   const RA = await direct({ cap: 4, secs: 25 });
@@ -417,7 +455,7 @@ async function main() {
     await rejects(send([await guessIx(RA, E1, s1, s1.word)], [E1]), 'guess after end');
   });
   await step('adversarial: settle with a wrong mint or a token account of another mint is refused; second settle refused', async () => {
-    const other = await splt.createMint(conn, host, host.publicKey, null, 6);
+    const other = await splt.createMint(conn, host, host.publicKey, null, 6, { proof: true });
     await rejects(send([prog.settle(RA.id, treasury.publicKey, [E1.publicKey, E2.publicKey], { ...tokB(RA), mint: other })], [E1]), 'wrong mint');
     const oa = await splt.getOrCreateAssociatedTokenAccount(conn, host, other, E1.publicKey);
     await rejects(send([prog.settle(RA.id, treasury.publicKey, [E1.publicKey, E2.publicKey], { ...tokB(RA), dest: (k) => (k.toBase58?.() || String(k)) === E1.publicKey.toBase58() ? oa.address : ataOf(E2) })], [E1]), 'wrong token account');
@@ -482,21 +520,21 @@ async function main() {
 
   await step('close_round: refused before settle, with an open card, to the wrong recipient, or with a non-empty escrow', async () => {
     const R = await direct({ cap: 4, secs: 60 });
-    await rejects(send([prog.closeRound(R.id, host.publicKey, { vault: R.vault, program: spl.TOKEN })], [E1]), 'close before settle');
+    await rejects(send([prog.closeRound(R.id, host.publicKey, { vault: R.vault, program: TPX })], [E1]), 'close before settle');
     // RA is settled; E1's card is still open
-    await rejects(send([prog.closeRound(RA.id, host.publicKey, { vault: RA.vault, program: spl.TOKEN })], [E1]), 'card still open');
+    await rejects(send([prog.closeRound(RA.id, host.publicKey, { vault: RA.vault, program: TPX })], [E1]), 'card still open');
     // tie round: settled, close both cards, then someone drops a token in the escrow
     for (const k of tieP) await send([prog.closeCard(tieR.id, k.publicKey)], [E1]);
     await splt.transfer(conn, host, ataOf(tieP[1]), tieR.vault, tieP[1], 1);
-    await rejects(send([prog.closeRound(tieR.id, host.publicKey, { vault: tieR.vault, program: spl.TOKEN })], [E1]), 'escrow not empty');
+    await rejects(send([prog.closeRound(tieR.id, host.publicKey, { vault: tieR.vault, program: TPX })], [E1]), 'escrow not empty');
   });
   await step('close_round: after settle + all cards closed, escrow and round rent go back to the host', async () => {
     await send([prog.closeCard(RA.id, E1.publicKey)], [E2]);
     assert.equal(readRound((await conn.getAccountInfo(prog.at.round(RA.id))).data).closedCards, 2);
-    await rejects(send([prog.closeRound(RA.id, E1.publicKey, { vault: RA.vault, program: spl.TOKEN })], [E1]), 'wrong recipient');
+    await rejects(send([prog.closeRound(RA.id, E1.publicKey, { vault: RA.vault, program: TPX })], [E1]), 'wrong recipient');
     const rent = (await conn.getAccountInfo(prog.at.round(RA.id))).lamports + (await conn.getAccountInfo(RA.vault)).lamports;
     const h0 = await conn.getBalance(host.publicKey);
-    await send([prog.closeRound(RA.id, host.publicKey, { vault: RA.vault, program: spl.TOKEN })], [E1]);   // anyone may call
+    await send([prog.closeRound(RA.id, host.publicKey, { vault: RA.vault, program: TPX })], [E1]);   // anyone may call
     assert.equal((await conn.getBalance(host.publicKey)) - h0, rent, 'host gets round + escrow rent back');
     assert.equal(await conn.getAccountInfo(prog.at.round(RA.id)), null); assert.equal(await conn.getAccountInfo(RA.vault), null);
     console.log(`    reclaimed ${rent / 1e9} SOL per bounty round`);

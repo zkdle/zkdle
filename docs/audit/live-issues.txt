@@ -1,0 +1,15 @@
+
+
+external links:
+https://x.com/zkdlefun
+https://github.com/zkdle/zkdle
+https://solscan.io/account/FuRUWehSQyB8EaMy5t8SRmYhKZEc8cBpYWBXripikXW6
+https://solscan.io/account/FYY8DXRz2ZvirwQxJqgkfrjftDH3Bsfpn9AyQwm5evvU
+https://solscan.io/account/A79M6eVude5szKrAX1M9ppRkti7Bx6P1evyYeFKWJe4Z
+https://github.com/zkdle/zkdle/blob/main/docs/test-report.md
+https://solscan.io/account/4fCcuHmPEfyVu8AtEWE1CtFoLyUrh8S58SS471JDGLtu
+https://solscan.io/account/J2sBh74Fma5NBEeqwdsJKLcSswqsVM36DjFfLpnSbgd6
+https://verify.osec.io/status/4fCcuHmPEfyVu8AtEWE1CtFoLyUrh8S58SS471JDGLtu
+https://solscan.io/account/4fCcuHmPEfyVu8AtEWE1CtFoLyUrh8S58SS471JDGLtu#security
+https://github.com/zkdle/zkdle/blob/main/SECURITY.md
+https://solscan.io/account/35BP4snQpLA7jYc5khjK3FNc8YzgpHbBA5piws7NKTmn

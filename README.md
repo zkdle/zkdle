@@ -60,7 +60,7 @@ Full rules with every number: **[zkdle.fun/docs](https://zkdle.fun/docs)**.
 
 <img src="docs/img/entry-split.png" width="100%">
 
-**Price.** At open, the server samples $PROOF’s on-chain reserves: the pump.fun bonding curve before graduation, then the pool’s reserve accounts (`ZK_PRICE_POOL_VAULTS`, PumpSwap or Raydium). It uses the **median over about 5 minutes**, clamped by `ZK_ROUND_ENTRY_MIN_TOKENS` / `MAX_TOKENS`. If no price is available, it falls back to `ZK_ROUND_ENTRY_TOKENS` (1,000). The UI shows the entry in $PROOF plus its ≈SOL value at open.
+**Price.** At open, the server samples $PROOF’s on-chain reserves: the pump.fun bonding curve before graduation, then the canonical PumpSwap pool’s reserve accounts, found automatically (`ZK_PRICE_POOL_VAULTS` overrides it with any pool). It uses the **median over about 5 minutes**, clamped by `ZK_ROUND_ENTRY_MIN_TOKENS` / `MAX_TOKENS`. If no fresh price is available, no new round opens until one is (the server never opens on a guessed entry). Both legacy SPL Token and Token-2022 mints (what pump.fun creates) work; `node scripts/set-mint-check.js <MINT>` checks a mint before launch. The UI shows the entry in $PROOF plus its ≈SOL value at open.
 
 **Payouts**
 

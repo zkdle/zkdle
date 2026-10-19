@@ -61,7 +61,7 @@ After every settle the server closes each card (rent to its player) and then the
 | `ZK_DB` | `/var/data/zkdle.db` (Render persistent disk mounted at `/var/data`, 1 GB; the server creates the directory and file if missing) |
 | `ZK_BASE_URL` | `https://zkdle.fun` |
 | `ZK_TOKEN_MINT` | empty until $PROOF launches. While empty, bounty shows "opens at token launch" |
-| `ZK_PRICE_POOL_VAULTS` | after graduation (PumpSwap/Raydium reserves); before that the pump.fun curve is read automatically |
+| `ZK_PRICE_POOL_VAULTS` | normally leave empty: the pump.fun curve is read before graduation and the canonical PumpSwap pool is found automatically after it. Set it only to force a specific pool (`<token vault>,<wSOL vault>`) |
 | `ZK_FEE_BPS` | `500` (already in the on-chain config; must match what `setup` used) |
 | optional | `ZK_ROUND_ENTRY_SOL=0.01`, `ZK_ROUND_CAP=12`, `ZK_MAX_POT_SOL_EQUIV=5`, `ZK_X_URL=https://x.com/zkdlefun` |
 
@@ -70,7 +70,7 @@ After every settle the server closes each card (rent to its player) and then the
 2. Run `setup(host=FYY8…, treasury=FuRU…, fee 500)` once. Check the config PDA.
 3. Fund the host with 1 SOL and send the treasury ~0.002 SOL. Set the Render env (`ZK_PREVIEW=1` still) and check `/api/config` in full mode on a staging service.
 4. Flip `ZK_PREVIEW=0`. The Daily and duels go live; bounty waits for the mint.
-5. After the $PROOF launch, set `ZK_TOKEN_MINT` and pre-create the treasury ATA. Bounty rounds open on the next tick.
+5. After the $PROOF launch, run `node scripts/set-mint-check.js <MINT>` (see "When the CA arrives" below), set `ZK_TOKEN_MINT` and redeploy. The first bounty round opens once the price TWAP has 3 fresh samples (≈ 3 minutes after boot); the server never opens a round on the fallback entry.
 6. Add the Program ID and mint to the site, docs and README wallet tables.
 7. Later: move the upgrade authority to Squads.
 
@@ -80,3 +80,14 @@ After every settle the server closes each card (rent to its player) and then the
 - Treasury `FuRUWehSQyB8EaMy5t8SRmYhKZEc8cBpYWBXripikXW6`: ~0.002 SOL rent top-up.
 - A Helius mainnet API key (Render env only), a Render persistent disk, and a generated and backed-up `ZK_SECRET_KEY`.
 - The $PROOF mint address after the launch. A Squads multisig later.
+
+## When the CA arrives
+pump.fun coins are created as **Token-2022** mints (6 decimals, MetadataPointer + TokenMetadata extensions). The program, server and site handle both Token-2022 and legacy SPL Token; the full e2e suite passes against the exact verified build with both (`ZK_E2E_TOKEN22=1 ZK_E2E_SO=<verified .so> node scripts/e2e.js`).
+
+1. `ZK_RPC=<helius url> node scripts/set-mint-check.js <MINT>`. It must show: token program, `decimals 6`, mint/freeze authority `none`, no BLOCKER line, a price source (`pump.fun bonding curve`) and a sane "0.01 SOL entry" token count.
+2. Render env: set `ZK_TOKEN_MINT=<MINT>`. Nothing else is required (`ZK_TOKEN_DECIMALS` only if the script says decimals isn't 6; the token program is read from the mint).
+3. Redeploy. In the log: `token program Tokenz… decimals 6`, then `bounty: waiting for a $PROOF price` for a few minutes, then the first round opens (the server creates the treasury's token account in that transaction).
+4. Check `/api/config` shows the mint and `/api/rounds` shows a round whose entry ≈ 0.01 SOL of $PROOF (`priceSource` starts with `twap:pump-curve`).
+5. Post the CA on @zkdlefun and add it to the site/README wallet tables.
+
+At graduation nothing needs doing: the curve reports `complete` and the pricer switches to the PumpSwap pool's reserves. The TWAP smooths the switch.

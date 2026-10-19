@@ -33,21 +33,32 @@ const log = (s) => { out.push(s); console.log(s); };
 
   if (!(await conn.getAccountInfo(prog.at.config()))) log(`- config setup (treasury ${treasury.publicKey.toBase58().slice(0, 6)}…, fee 5%): [tx](${tx(await send([prog.setup(host.publicKey, treasury.publicKey, 500)], [host]))})`);
   // test $PROOF (6 decimals) + a mock pool so the TWAP prices the entry: 1,000,000 PROOF vs 5 "SOL" -> 0.000005 SOL/PROOF
-  const st = path.join(K, 'devnet-state.json');
+  // DEVNET_TOKEN22=1: the $PROOF stand-in is a pump.fun-style Token-2022 mint (MetadataPointer + TokenMetadata)
+  const T22 = process.env.DEVNET_TOKEN22 === '1', TP = T22 ? splt.TOKEN_2022_PROGRAM_ID : splt.TOKEN_PROGRAM_ID;
+  const st = path.join(K, T22 ? 'devnet-state-t22.json' : 'devnet-state.json');
   let S = fs.existsSync(st) ? JSON.parse(fs.readFileSync(st)) : null;
   if (!S) {
-    const mint = await splt.createMint(conn, host, host.publicKey, null, 6);
+    let mint;
+    if (T22) {
+      const meta = require('@solana/spl-token-metadata'), kpM = web3.Keypair.generate();
+      const len = splt.getMintLen([splt.ExtensionType.MetadataPointer]);
+      const full = len + splt.TYPE_SIZE + splt.LENGTH_SIZE + meta.pack({ mint: kpM.publicKey, name: 'ZKdle Proof', symbol: 'PROOF', uri: 'https://zkdle.fun/token.json', additionalMetadata: [] }).length;
+      await send([web3.SystemProgram.createAccount({ fromPubkey: host.publicKey, newAccountPubkey: kpM.publicKey, space: len, lamports: await conn.getMinimumBalanceForRentExemption(full), programId: TP }),
+        splt.createInitializeMetadataPointerInstruction(kpM.publicKey, host.publicKey, kpM.publicKey, TP), splt.createInitializeMintInstruction(kpM.publicKey, 6, host.publicKey, null, TP),
+        meta.createInitializeInstruction({ programId: TP, metadata: kpM.publicKey, updateAuthority: host.publicKey, mint: kpM.publicKey, mintAuthority: host.publicKey, name: 'ZKdle Proof', symbol: 'PROOF', uri: 'https://zkdle.fun/token.json' })], [host, kpM]);
+      mint = kpM.publicKey;
+    } else mint = await splt.createMint(conn, host, host.publicKey, null, 6);
     const wsol = await splt.createMint(conn, host, host.publicKey, null, 9);
     const pool = web3.Keypair.generate();
-    const pt = await splt.createAccount(conn, host, mint, pool.publicKey, web3.Keypair.generate());
+    const pt = await splt.createAccount(conn, host, mint, pool.publicKey, web3.Keypair.generate(), undefined, TP);
     const ps = await splt.createAccount(conn, host, wsol, pool.publicKey, web3.Keypair.generate());
-    await splt.mintTo(conn, host, mint, pt, host, 1_000_000e6); await splt.mintTo(conn, host, wsol, ps, host, 5e9);
-    for (const k of [A, B]) { const a = await splt.getOrCreateAssociatedTokenAccount(conn, host, mint, k.publicKey); await splt.mintTo(conn, host, mint, a.address, host, 100_000e6); }
+    await splt.mintTo(conn, host, mint, pt, host, 1_000_000e6, [], undefined, TP); await splt.mintTo(conn, host, wsol, ps, host, 5e9);
+    for (const k of [A, B]) { const a = await splt.getOrCreateAssociatedTokenAccount(conn, host, mint, k.publicKey, false, undefined, undefined, TP); await splt.mintTo(conn, host, mint, a.address, host, 100_000e6, [], undefined, TP); }
     S = { mint: mint.toBase58(), pt: pt.toBase58(), ps: ps.toBase58() };
     fs.writeFileSync(st, JSON.stringify(S));
   }
   const mint = new web3.PublicKey(S.mint);
-  log(`- test $PROOF mint: [${S.mint}](${acct(S.mint)}) · mock pool vaults ${S.pt.slice(0, 6)}… / ${S.ps.slice(0, 6)}… (0.000005 SOL per PROOF)\n`);
+  log(`- test $PROOF mint (${T22 ? 'Token-2022 + metadata extensions, like pump.fun' : 'SPL Token'}): [${S.mint}](${acct(S.mint)}) · mock pool vaults ${S.pt.slice(0, 6)}… / ${S.ps.slice(0, 6)}… (0.000005 SOL per PROOF)\n`);
 
   const env = { ...process.env, ZK_PREVIEW: '0', ZK_TEST: '1', ZK_CLUSTER: 'devnet', ZK_RPC: RPC, ZK_PROGRAM_ID: pid, PORT: String(PORT), ZK_TOKEN_MINT: S.mint, ZK_PRICE_POOL_VAULTS: `${S.pt},${S.ps}`,
     ZK_PRICE_SAMPLE_SECS: '3600', ZK_PRICE_MIN_SAMPLES: '1', ZK_HOST_KEY: JSON.stringify([...host.secretKey]), ZK_TREASURY: treasury.publicKey.toBase58(), ZK_DB: path.join(K, 'devnet-db.json'),
@@ -80,9 +91,9 @@ const log = (s) => { out.push(s); console.log(s); };
     await api('/api/test/price', {});
     const { id } = await api('/api/test/round', { secs: 600, cap: 2 });
     const pub = await api(`/api/rounds/${id}`);
-    const ta = (k) => splt.getAssociatedTokenAddressSync(mint, k, true);
-    const bal = async (a) => { try { return Number((await splt.getAccount(conn, a)).amount) / 1e6; } catch { return 0; } };
-    const supply = async () => Number((await splt.getMint(conn, mint)).supply) / 1e6;
+    const ta = (k) => splt.getAssociatedTokenAddressSync(mint, k, true, TP);
+    const bal = async (a) => { try { return Number((await splt.getAccount(conn, a, undefined, TP)).amount) / 1e6; } catch { return 0; } };
+    const supply = async () => Number((await splt.getMint(conn, mint, undefined, TP)).supply) / 1e6;
     const vault = ta(prog.at.round(id)), tTa = ta(treasury.publicKey);
     const before = { A: await bal(ta(A.publicKey)), B: await bal(ta(B.publicKey)), T: await bal(tTa), supply: await supply() };
     const joins = [];
@@ -115,6 +126,6 @@ const log = (s) => { out.push(s); console.log(s); };
     const ab1 = await conn.getBalance(A.publicKey), bb1 = await conn.getBalance(B.publicKey), tb1 = await conn.getBalance(treasury.publicKey);
     log(`## Duel ${d.id} (0.05 SOL each)\n- create: [tx](${tx(dOpen)}) · accept: [tx](${tx(dJoin)}) · settle/payout: [tx](${tx(dr.settleSig)})`);
     log(`- B solved in 1, A in 3 → B wins. Treasury +${((tb1 - tb0) / 1e9).toFixed(4)} SOL (5% of 0.1). B net ${((bb1 - bb0) / 1e9).toFixed(5)} SOL, A net ${((ab1 - ab0) / 1e9).toFixed(5)} SOL (incl. tx fees, card rent refunded, duel round rent back to A); duel round closed: **${!(await conn.getAccountInfo(prog.at.round(d.id)))}**`);
-    fs.writeFileSync(path.join(ROOT, 'docs', 'devnet-run.md'), out.join('\n') + '\n');
+    fs.writeFileSync(path.join(ROOT, 'docs', T22 ? 'devnet-run-token2022.md' : 'devnet-run.md'), out.join('\n') + '\n');
   } finally { srv.kill(); }
 })().catch((e) => { console.error(String(e.message || e).replaceAll(RPC, '[rpc]')); process.exitCode = 1; });

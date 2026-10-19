@@ -7,7 +7,7 @@
 <meta name="description" content="A five-letter word game on Solana. Every clue comes with a zero-knowledge proof checked on-chain. Free daily, bounty rounds, duels.">
 <meta property="og:title" content="ZKdle">
 <meta property="og:description" content="The word was sealed before you guessed. Every clue is proven on Solana.">
-<meta property="og:image" content="/brand/og.png">
+<meta property="og:image" content="https://zkdle.fun/brand/og.png"><meta name="twitter:image" content="https://zkdle.fun/brand/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#f4ecdc">
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
@@ -95,7 +95,7 @@
 
     <section id="money"><h2>Entry, burn &amp; pot</h2>
       <figure><img src="/img/docs/entry-split.png" alt="Entry split" loading="lazy"></figure>
-      <p><b>Price.</b> When a round opens, the server reads $PROOF’s on-chain reserves: the pump.fun bonding curve before graduation, then the pool’s two reserve accounts (PumpSwap or Raydium). It takes the <b>median of several samples over about 5 minutes</b>, so a single pumped block can’t move the entry. The resulting $PROOF amount is clamped to configured min/max values and written into the round account. It stays fixed for that round even if the price moves. If no price is available (for example, right after launch), a fallback of 1,000 $PROOF is used. The round page shows the entry in $PROOF and its ≈SOL value at open.</p>
+      <p><b>Price.</b> When a round opens, the server reads $PROOF’s on-chain reserves: the pump.fun bonding curve before graduation, then the two reserve accounts of its PumpSwap pool. It takes the <b>median of several samples over about 5 minutes</b>, so a single pumped block can’t move the entry. The resulting $PROOF amount is clamped to configured min/max values and written into the round account. It stays fixed for that round even if the price moves. If no fresh price is available (for example, in the first minutes after launch), the next round simply waits until there is one. The round page shows the entry in $PROOF and its ≈SOL value at open.</p>
       <p><b>At entry, in the same transaction as your seat:</b> 10% is burned with an SPL <code>BurnChecked</code> (total supply goes down), 5% goes to the treasury’s token account, and 85% moves into a token account owned by the round’s program address. Nobody holds a key to that escrow; only the settle instruction can move it.</p>
     </section>
 
