@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZKdle — verify, don’t trust</title>
+<meta name="description" content="A five-letter word game on Solana. Every clue comes with a zero-knowledge proof checked on-chain. Free daily, bounty rounds, duels.">
+<meta property="og:title" content="ZKdle">
+<meta property="og:description" content="The word was sealed before you guessed. Every clue is proven on Solana.">
+<meta property="og:image" content="/brand/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f4ecdc">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/brand/favicon-16.png" sizes="16x16">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/site.css">
+</head>
+<body class="landing">
+<div class="bg" aria-hidden="true">
+  <div class="bg-mesh"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i></div>
+  <div class="bg-grid"></div>
+  <img class="bg-seal s-a" src="/brand/token-pf.svg" alt="">
+  <img class="bg-seal s-b" src="/brand/token-pf.svg" alt="">
+  <div class="bg-grain"></div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="sealmark" viewBox="0 0 200 200"><path d="M100 8c12 0 18 9 29 12s21-1 29 7 4 18 7 29 12 17 12 29-9 18-12 29 1 21-7 29-18 4-29 7-17 12-29 12-18-9-29-12-21 1-29-7-4-18-7-29S8 112 8 100s9-18 12-29-1-21 7-29 18-4 29-7S88 8 100 8z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="100" cy="100" r="62" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 6"/><text x="100" y="118" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="56" fill="currentColor">zk</text></symbol>
+</defs></svg>
+
+<header class="top">
+  <a class="mark" href="/"><img class="mark-seal" src="/brand/seal.svg" alt="" width="38" height="38"><span>ZKdle</span></a>
+  <nav class="links">
+    <a href="#flip">The idea</a>
+    <a href="#how" data-t="nav.how">How it works</a>
+    <a href="#modes" data-t="nav.modes">Modes</a>
+    <a href="#token" data-t="nav.token">Token</a>
+    <a href="#trust" data-t="nav.trust">Trust</a>
+    <a href="/docs">Docs</a>
+  </nav>
+  <div class="tools">
+    <a class="ico" data-link="x" href="#" aria-label="X" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.8 3h3.1l-6.8 7.7 8 10.3h-6.2l-4.9-6.3L5.4 21H2.3l7.2-8.3L1.8 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg></a>
+    <a class="ico" data-link="github" href="#" aria-label="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.6.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.5 9.5 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></a>
+    <a class="pill" href="/play" data-t="nav.play">Play today</a>
+  </div>
+</header>
+
+<main>
+  <!-- HERO: pinned; tiles flip and get sealed while you scroll -->
+  <section class="hero" id="top">
+    <div class="hero-pin">
+      <div class="hero-meta">
+        <span>Nº 001</span><span class="dash"></span><span>A word game with receipts</span><span class="dash"></span><span>Solana</span>
+      </div>
+      <h1 class="hero-title split"><span class="ln">The word was</span> <span class="ln">sealed <em>before</em></span> <span class="ln">you guessed.</span></h1>
+      <div class="hero-tiles" aria-hidden="true">
+        <div class="ht"><div class="card"><div class="f">C</div><div class="k c0">C</div></div></div>
+        <div class="ht"><div class="card"><div class="f">R</div><div class="k c1">R</div></div></div>
+        <div class="ht"><div class="card"><div class="f">A</div><div class="k c0">A</div></div></div>
+        <div class="ht"><div class="card"><div class="f">N</div><div class="k c2">N</div></div></div>
+        <div class="ht"><div class="card"><div class="f">E</div><div class="k c0">E</div></div></div>
+        <img class="hero-seal" src="/brand/seal.svg" alt="">
+      </div>
+      <div class="hero-foot">
+        <p class="lede" data-t="hero.lede"></p>
+        <div class="ctas">
+          <a class="btn wax" href="/play" data-t="hero.cta">Play today’s word</a>
+          <a class="btn ghost" href="#how" data-t="hero.cta2">See how the seal works</a>
+        </div>
+      </div>
+      <div class="hero-proof" aria-hidden="true">
+        <span class="hp-l">commitment</span><span class="hp-v">poseidon(word, salt) = <b class="hash-run">0x1d4f…a07c</b></span>
+      </div>
+      <p class="scroll-hint"><span>Scroll to seal</span><i></i></p>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="mq-track">
+    <span>Verify, don’t trust</span><b>✺</b><span>Groth16 on Solana</span><b>✺</b><span>Poseidon commitments</span><b>✺</b><span>Six tries, one seal</span><b>✺</b>
+    <span>Verify, don’t trust</span><b>✺</b><span>Groth16 on Solana</span><b>✺</b><span>Poseidon commitments</span><b>✺</b><span>Six tries, one seal</span><b>✺</b>
+  </div></div>
+
+  <!-- the pinned board -->
+  <section class="flip-stage" id="flip">
+    <div class="flip-pin">
+      <div class="flip-lines">
+        <p class="line a" data-t="flip.a">Most word games ask you to trust the house.</p>
+        <p class="line b" data-t="flip.b">Ours hands you a proof for every tile.</p>
+      </div>
+      <div class="board-wrap">
+        <div class="board" id="demo-board"></div>
+        <div class="proof-col" id="proof-col"></div>
+        <img class="seal-drop" src="/brand/seal.svg" alt="">
+      </div>
+      <div class="meter"><span></span></div>
+    </div>
+  </section>
+
+  <!-- HOW: pinned horizontal sequence -->
+  <section class="how" id="how">
+    <div class="how-pin">
+      <header class="how-head">
+        <p class="eyebrow-l">Chapter II</p>
+        <h2 class="split" data-t="how.title">Verify, don’t trust — in three moves</h2>
+        <div class="how-progress"><span></span></div>
+      </header>
+      <div class="how-track">
+        <article class="panel">
+          <span class="big-num">01</span>
+          <div class="panel-body">
+            <h3 data-t="how.1.t">Seal</h3><p data-t="how.1.b"></p>
+            <code class="hash">poseidon(word, salt) → 0x1d4f…a07c</code>
+          </div>
+          <img class="seal-art" src="/brand/seal.svg" alt="">
+        </article>
+        <article class="panel">
+          <span class="big-num">02</span>
+          <div class="panel-body">
+            <h3 data-t="how.2.t">Prove</h3><p data-t="how.2.b"></p>
+            <code class="hash">proof = (A, B, C) · 11 public inputs</code>
+          </div>
+          <div class="panel-art tiles-art"><i class="c1"></i><i class="c2"></i><i class="c0"></i><i class="c1"></i><i class="c1"></i></div>
+        </article>
+        <article class="panel">
+          <span class="big-num">03</span>
+          <div class="panel-body">
+            <h3 data-t="how.3.t">Reveal</h3><p data-t="how.3.b"></p>
+            <code class="hash">word + salt → same hash ✓</code>
+          </div>
+          <div class="panel-art broken"><img src="/brand/seal.svg" alt=""><img src="/brand/seal.svg" alt=""></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="numbers">
+    <div class="num"><b data-count="256">0</b><span>bytes per proof</span></div>
+    <div class="num"><b data-count="1">0</b><span>transaction to verify</span></div>
+    <div class="num"><b data-count="6">0</b><span>tries, same as ever</span></div>
+    <div class="num"><b data-count="10" data-suffix="%">0</b><span>of every bounty entry burned</span></div>
+  </section>
+
+  <section class="modes" id="modes">
+    <div class="sec-head">
+      <p class="eyebrow-l">Chapter III</p>
+      <h2 class="split" data-t="modes.title">Pick your table</h2>
+    </div>
+    <ol class="mode-list">
+      <li class="mode"><span class="m-idx">i.</span><h3 data-t="modes.daily.t">The Daily</h3><p data-t="modes.daily.b"></p><span class="tag" data-t="modes.daily.tag">free</span><div class="m-tiles"><i class="c1"></i><i class="c1"></i><i class="c2"></i></div></li>
+      <li class="mode"><span class="m-idx">ii.</span><h3 data-t="modes.bounty.t">Bounty rounds</h3><p data-t="modes.bounty.b"></p><span class="tag when-token" data-t="modes.bounty.tag">top 30% paid</span><span class="tag pending when-no-token" data-pending="bounty">Opens when $PROOF launches</span><div class="m-tiles"><i class="c2"></i><i class="c0"></i><i class="c1"></i></div></li>
+      <li class="mode"><span class="m-idx">iii.</span><h3 data-t="modes.duel.t">Duels</h3><p data-t="modes.duel.b"></p><span class="tag" data-t="modes.duel.tag">shareable link</span><div class="m-tiles"><i class="c0"></i><i class="c2"></i><i class="c2"></i></div></li>
+    </ol>
+  </section>
+
+  <section class="split-sec">
+    <div class="split-copy">
+      <h2 class="split" data-t="split.title">How a pot gets split</h2>
+      <p data-t="split.body"></p>
+    </div>
+    <div class="ribbons" aria-hidden="true">
+      <div class="ribbon r1"><b>1st</b><span>2 guesses · 41s own time</span><i>8,500</i></div>
+      <div class="ribbon r2"><b>2nd</b><span>3 guesses · 58s</span><i>5,667</i></div>
+      <div class="ribbon r3"><b>3rd</b><span>3 guesses · 1m12s</span><i>2,833</i></div>
+      <div class="ribbon fee"><b>burn</b><span>10% of every entry · gone</span><i>2,000</i></div>
+    </div>
+  </section>
+
+  <section class="token" id="token">
+    <div class="token-inner">
+      <div class="coin" aria-hidden="true">
+        <img class="medal" src="/brand/token-pf.svg" alt="$PROOF · Pf wax seal">
+      </div>
+      <div class="token-copy">
+        <p class="eyebrow-l">Chapter IV · <span data-t="token.title">The token</span></p>
+        <h2><span class="tk-name">ZKdle Proof</span> <span class="tk-sym">$PROOF</span></h2>
+        <dl class="ledger">
+          <dt data-t="token.ca">Contract</dt><dd class="ca"><span data-t="token.soon">Not launched yet</span></dd>
+          <dt data-t="token.treasury">Treasury</dt><dd class="treasury"><a href="https://solscan.io/account/FuRUWehSQyB8EaMy5t8SRmYhKZEc8cBpYWBXripikXW6" target="_blank" rel="noopener">FuRU…ikXW6</a> · Solscan ↗</dd>
+          <dt>Host</dt><dd><a href="https://solscan.io/account/FYY8DXRz2ZvirwQxJqgkfrjftDH3Bsfpn9AyQwm5evvU" target="_blank" rel="noopener">FYY8…5evvU</a> · Solscan ↗</dd>
+          <dt>Deployer</dt><dd><a href="https://solscan.io/account/A79M6eVude5szKrAX1M9ppRkti7Bx6P1evyYeFKWJe4Z" target="_blank" rel="noopener">A79M…WJe4Z</a> · Solscan ↗</dd>
+          <dt>Program</dt><dd>set at deploy</dd>
+          <dt></dt><dd><a href="/docs#wallets">All public wallets and what they do →</a></dd>
+        </dl>
+        <ol class="utility">
+          <li data-t="token.u1"></li><li data-t="token.u2"></li><li data-t="token.u3"></li><li data-t="token.u4"></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust" id="trust">
+    <div class="sec-head">
+      <p class="eyebrow-l">Chapter V</p>
+      <h2 class="split" data-t="trust.title">What you trust, honestly</h2>
+    </div>
+    <div class="columns">
+      <div class="col chain"><h3 data-t="trust.chain">Enforced by the program</h3><ol><li data-t="trust.c1"></li><li data-t="trust.c2"></li><li data-t="trust.c3"></li><li data-t="trust.c4"></li></ol></div>
+      <div class="col us"><h3 data-t="trust.us">Still trusting us</h3><ol><li data-t="trust.u1"></li><li data-t="trust.u2"></li><li data-t="trust.u3"></li><li data-t="trust.u4"></li><li data-t="trust.u5"></li></ol></div>
+    </div>
+  </section>
+
+  <section class="final">
+    <img class="final-seal" src="/brand/token-pf.svg" alt="" aria-hidden="true">
+    <h2 class="split" data-t="cta.title">Today’s answer is sealed. Don’t trust us — verify.</h2>
+    <a class="btn wax big" href="/play" data-t="cta.btn">Break the seal</a>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot-big" aria-hidden="true">ZKdle</div>
+  <div class="foot-row">
+    <a class="mark" href="/"><img class="mark-seal" src="/brand/seal.svg" alt="" width="38" height="38"><span>ZKdle</span></a>
+    <p data-t="foot.made">Open source. MIT licensed.</p>
+    <div class="foot-links"><a data-link="x" href="#" target="_blank" rel="noopener">X · @zkdlefun</a><a href="/docs">Docs</a><a data-link="github" href="#" target="_blank" rel="noopener">GitHub</a><button class="sound" type="button"><span class="eq"><i></i><i></i><i></i></span><span data-t="foot.sound">sound</span> <i>off</i></button></div>
+  </div>
+  <p class="net"></p>
+</footer>
+<script src="/landing.js" defer></script>
+</body>
+</html>

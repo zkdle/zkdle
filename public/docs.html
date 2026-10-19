@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Docs · ZKdle</title>
+<meta name="description" content="A five-letter word game on Solana. Every clue comes with a zero-knowledge proof checked on-chain. Free daily, bounty rounds, duels.">
+<meta property="og:title" content="ZKdle">
+<meta property="og:description" content="The word was sealed before you guessed. Every clue is proven on Solana.">
+<meta property="og:image" content="/brand/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f4ecdc">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/brand/favicon-16.png" sizes="16x16">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/docs.css">
+</head>
+<body class="docs">
+<div class="bg" aria-hidden="true">
+  <div class="bg-mesh"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i></div>
+  <div class="bg-grid"></div>
+  <img class="bg-seal s-a" src="/brand/token-pf.svg" alt="">
+  <img class="bg-seal s-b" src="/brand/token-pf.svg" alt="">
+  <div class="bg-grain"></div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="sealmark" viewBox="0 0 200 200"><path d="M100 8c12 0 18 9 29 12s21-1 29 7 4 18 7 29 12 17 12 29-9 18-12 29 1 21-7 29-18 4-29 7-17 12-29 12-18-9-29-12-21 1-29-7-4-18-7-29S8 112 8 100s9-18 12-29-1-21 7-29 18-4 29-7S88 8 100 8z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="100" cy="100" r="62" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 6"/><text x="100" y="118" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="56" fill="currentColor">zk</text></symbol>
+</defs></svg>
+<header class="top">
+  <a class="mark" href="/"><img class="mark-seal" src="/brand/seal.svg" alt="" width="38" height="38"><span>ZKdle</span></a>
+  <nav class="links">
+    <a href="/#flip">The idea</a>
+    <a href="/#how" data-t="nav.how">How it works</a>
+    <a href="/#modes" data-t="nav.modes">Modes</a>
+    <a href="/#token" data-t="nav.token">Token</a>
+    <a href="/#trust" data-t="nav.trust">Trust</a>
+    <a href="/docs">Docs</a>
+  </nav>
+  <div class="tools">
+    <a class="ico" data-link="x" href="#" aria-label="X" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.8 3h3.1l-6.8 7.7 8 10.3h-6.2l-4.9-6.3L5.4 21H2.3l7.2-8.3L1.8 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg></a>
+    <a class="ico" data-link="github" href="#" aria-label="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.6.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.5 9.5 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></a>
+    <a class="pill" href="/play" data-t="nav.play">Play today</a>
+  </div>
+</header>
+<main class="doc">
+  <aside class="toc"><p class="eyebrow-l">Contents</p><ol>
+    <li><a href="#sealing">Sealing &amp; proofs</a></li><li><a href="#daily">The Daily</a></li><li><a href="#bounty">Bounty rounds</a></li>
+    <li><a href="#fair">Fairness</a></li><li><a href="#money">Entry, burn &amp; pot</a></li><li><a href="#payouts">Payouts &amp; refunds</a></li>
+    <li><a href="#duel">Duels</a></li><li><a href="#token">$PROOF</a></li><li><a href="#trust">Trust &amp; limits</a></li><li><a href="#security">Security</a></li><li><a href="#wallets">Public wallets</a></li><li><a href="#roadmap">Early access</a></li>
+  </ol></aside>
+  <article class="prose">
+    <header class="doc-head"><p class="eyebrow-l">Documentation</p><h1>How ZKdle works</h1>
+      <p class="lede">A five-letter word game where the answer is sealed on Solana before you guess, and every clue comes with a zero-knowledge proof that it was computed against that seal. Here are the exact rules and numbers, with nothing rounded off.</p></header>
+
+    <section id="sealing"><h2>Sealing &amp; proofs</h2>
+      <figure><img src="/img/docs/seal-flow.png" alt="Seal, prove, reveal" loading="lazy"></figure>
+      <p><b>Seal.</b> Before anyone plays, the server picks the word and a random 248-bit salt and computes <code>Poseidon(word, salt)</code>. Only that hash, the <em>seal</em>, is written on-chain: in the day account for the Daily, and in each player’s own card for bounty and duel seats.</p>
+      <p><b>Prove.</b> For every guess the server returns the colours plus a Groth16 proof (about 256 bytes) that those colours are what the sealed word really gives. The Solana program checks the proof against the stored seal before it records the row, so a wrong colour can’t be recorded.</p>
+      <p><b>Reveal.</b> When the day or round closes, the word and salt are published. Anyone can hash them again and confirm they match the seal. The play page has a “Check the seal” button that does it in your browser.</p>
+    </section>
+
+    <section id="daily"><h2>The Daily</h2>
+      <figure class="shot"><img src="/img/docs/ui-daily.png" alt="Daily board" loading="lazy"></figure>
+      <ul class="rules"><li>One word for everyone, six tries, free, and no wallet needed. Sealing a run on-chain costs only Solana fees and rent for your card and streak accounts.</li><li>Clues are proven and checked in your browser. Connect a wallet to “seal my run” on-chain and keep your streak in your own streak account (a PDA).</li><li>A new word every 24 h (00:00 UTC). Yesterday’s word and salt are published for re-checking.</li><li>Streak repair: burn 500 $PROOF to bridge exactly one missed day.<span class="when-no-token"> <em>Available after $PROOF launches.</em></span></li></ul>
+    </section>
+
+    <section id="bounty"><h2>Bounty rounds</h2>
+      <p class="when-no-token" data-pending="bounty"><b>Bounty rounds open once $PROOF is live.</b> Until then, the Daily and SOL duels are open.</p>
+      <figure class="shot"><img src="/img/docs/ui-bounty.png" alt="Bounty round page" loading="lazy"></figure>
+      <table class="nums"><tbody>
+        <tr><th>Round length</th><td>1 hour; the next round opens as the previous one closes</td></tr>
+        <tr><th>Seats</th><td><b>12 per round</b> during early access (the program refuses more), one seat per wallet per round</td></tr>
+        <tr><th>Entry</th><td>The $PROOF worth <b>0.01 SOL</b>, fixed once when the round opens and stored in the round account</td></tr>
+        <tr><th>Per entry</th><td>10% burned · 5% treasury · 85% into the round’s escrow (the pot)</td></tr>
+        <tr><th>Paid places</th><td>Top 30% of seats, rounded up (12 seats → 4 paid)</td></tr>
+        <tr><th>Ranking</th><td>Fewer guesses, then shorter <em>own</em> time</td></tr>
+        <tr><th>Last call</th><td>No new seats in the final 2 minutes; a warning appears when fewer than 10 minutes are left</td></tr>
+      </tbody></table>
+    </section>
+
+    <section id="fair"><h2>Fairness: no first-mover advantage</h2>
+      <figure><img src="/img/docs/round-timeline.png" alt="Round timeline with own clocks" loading="lazy"></figure>
+      <ul class="rules">
+        <li><b>Your own clock.</b> Time is measured from the moment <em>you</em> sit down until your last guess. Joining at minute 41 is no worse than joining at minute 2.</li>
+        <li><b>Your own word.</b> Every seat gets a different word, derived from a seed that was committed (hashed on-chain) before the round opened. A player who finishes early can’t leak your answer.</li>
+        <li><b>Solving first doesn’t end it.</b> The round only ends early when every seat is taken <em>and</em> every board is finished. Otherwise it runs the full hour.</li>
+        <li><b>Leave yourself time.</b> Seats close 2 minutes before the end, and the game warns you if fewer than 10 minutes are left. Boards still open at the close count as unsolved.</li>
+        <li><b>Rationed proofs.</b> Only the server can make proofs, so it issues six per seat and no more.</li>
+      </ul>
+    </section>
+
+    <section id="money"><h2>Entry, burn &amp; pot</h2>
+      <figure><img src="/img/docs/entry-split.png" alt="Entry split" loading="lazy"></figure>
+      <p><b>Price.</b> When a round opens, the server reads $PROOF’s on-chain reserves: the pump.fun bonding curve before graduation, then the pool’s two reserve accounts (PumpSwap or Raydium). It takes the <b>median of several samples over about 5 minutes</b>, so a single pumped block can’t move the entry. The resulting $PROOF amount is clamped to configured min/max values and written into the round account. It stays fixed for that round even if the price moves. If no price is available (for example, right after launch), a fallback of 1,000 $PROOF is used. The round page shows the entry in $PROOF and its ≈SOL value at open.</p>
+      <p><b>At entry, in the same transaction as your seat:</b> 10% is burned with an SPL <code>BurnChecked</code> (total supply goes down), 5% goes to the treasury’s token account, and 85% moves into a token account owned by the round’s program address. Nobody holds a key to that escrow; only the settle instruction can move it.</p>
+    </section>
+
+    <section id="payouts"><h2>Payouts &amp; refunds</h2>
+      <figure><img src="/img/docs/payout-curve.png" alt="Payout curve" loading="lazy"></figure>
+      <p>Winners are the top 30% of seats, rounded up. Shares fall linearly: with <i>k</i> winners the weights are <i>k</i>, <i>k</i>−1, … 1. First place also gets any rounding dust. An exact tie (same guesses and same own time, to the second) goes to the earlier seat.</p>
+      <table class="nums ex"><thead><tr><th>Example (2,000 $PROOF entry)</th><th>Pot</th><th>1st</th><th>2nd</th><th>3rd</th><th>4th</th></tr></thead><tbody>
+        <tr><td>4 seats → 2 winners</td><td>6,800</td><td>4,533</td><td>2,267</td><td>—</td><td>—</td></tr>
+        <tr><td>10 seats → 3 winners</td><td>17,000</td><td>8,500</td><td>5,667</td><td>2,833</td><td>—</td></tr>
+        <tr><td>12 seats → 4 winners</td><td>20,400</td><td>8,160</td><td>6,120</td><td>4,080</td><td>2,040</td></tr>
+      </tbody></table>
+      <p class="small">10 winners (later phases, 33 seats, pot 56,100): 10,200 · 9,180 · 8,160 · 7,140 · 6,120 · 5,100 · 4,080 · 3,060 · 2,040 · 1,020.</p>
+      <p><b>No solver → refund.</b> If nobody solves, each seat gets its escrowed 85% back. Only the 10% burn and the 5% fee are spent. If fewer seats solve than there are paid places, only the solvers are paid.</p>
+      <p><b>Settlement</b> is one instruction that anyone can call once the round is over. Afterwards each seat’s card account is closed and its rent goes back to the player.</p>
+    </section>
+
+    <section id="duel"><h2>Duels</h2>
+      <figure><img src="/img/docs/duel-flow.png" alt="Duel flow" loading="lazy"></figure>
+      <figure class="shot"><img src="/img/docs/ui-duel.png" alt="Duel page" loading="lazy"></figure>
+      <ul class="rules"><li>Two players, equal <b>SOL</b> stakes (duels stay in SOL), and a different sealed word each.</li><li>Post the link on X and it unfolds into a “Take the duel” Blink.</li><li>Fewer guesses wins; a tie goes to the shorter own time. The winner takes both stakes minus the 5% fee.</li><li>Stake between 0.005 and 100 SOL.</li><li>Settles as soon as both boards are finished; open for up to 24 h. If nobody accepts, or neither side solves, both stakes come back in full with no fee.</li></ul>
+    </section>
+
+    <section id="token"><h2>$PROOF</h2>
+      <ul class="rules"><li><b>Bounty entries:</b> 10% of each entry is burned.</li><li><b>Streak repair:</b> burn 500 $PROOF to bridge one missed day.<span class="when-no-token"> <em>Available after $PROOF launches.</em></span></li><li><b>Holder frame:</b> wallets holding at least 100,000 $PROOF get a gold frame and a holder badge on their share card.</li><li><b>Treasury:</b> 5% of each entry goes to a public treasury token account, linked on the home page.</li></ul>
+    </section>
+
+    <section id="trust"><h2>Trust model &amp; known limits</h2>
+      <div class="two"><div><h3>Enforced by the program</h3><ul class="rules"><li>Every recorded clue matches the seal (Groth16 verified on-chain).</li><li>Burn, fee, escrow, payout order, the 30% cut and refunds are all computed on-chain.</li><li>Fee capped at 20% in code (set to 5%) and only payable to the configured treasury. Burn capped at 50% (set to 10%).</li><li>Round seeds are committed before entry; the reveal must hash to the commitment.</li></ul></div>
+      <div><h3>Still trusting us</h3><ul class="rules"><li>The server knows the answers (it has to, to build proofs). A dishonest operator could leak them.</li><li>Seats are co-signed by the server, which issues six proofs per seat.</li><li>Words and seeds are random on our side: the commitment stops us from changing them, not from choosing them.</li><li>Phase-2 trusted setup: three team contributions plus a public random beacon. Public contributions come next (see Security).</li><li>The entry price comes from a server-side TWAP of on-chain reserves, within configured clamps.</li></ul></div></div>
+    </section>
+
+    <section id="security"><h2>Security &amp; trust</h2>
+      <figure><img src="/img/docs/security.png" alt="Security and trust model" loading="lazy"></figure>
+      <h3>What we harden on the server</h3>
+      <ul class="rules">
+        <li><b>Fresh secrets.</b> Every day gets a new random salt; every round and duel a new 32-byte seed, committed on-chain before anyone enters. Seat words are derived from the seed, so revealing it lets anyone recheck every seat.</li>
+        <li><b>Encrypted at rest.</b> The state file holding live answers, salts and seeds is AES-256-GCM encrypted with <code>ZK_SECRET_KEY</code>. Outside the local test network the server refuses to start without it.</li>
+        <li><b>No leaks before reveal.</b> No endpoint, share card or error returns a live answer, salt or seed. Unexpected errors are reduced to <i>server error (id)</i>, and log lines are scrubbed. An end-to-end test greps every public response for the live secrets.</li>
+        <li><b>Rate limits and replays.</b> Per-IP and per-wallet limits on guesses and seats. Six proofs per seat, no repeated guesses, and nothing after the round ends or is revealed.</li>
+        <li><b>Pot cap.</b> <code>ZK_MAX_POT_SOL_EQUIV</code> (default 5 SOL equivalent) caps what any one round can hold. New seats are refused past it.</li>
+        <li><b>Separate keys.</b> The host key only co-signs and opens/reveals. It can't move escrow anywhere except to the payout the program computes. The treasury is just an address, and its key is never on the server.</li>
+      </ul>
+      <h3>Rent comes back</h3>
+      <p>After settlement every seat card is closed and its rent goes back to the player. Then <code>close_round</code> closes the empty escrow and the round account and returns their rent to whoever opened the round. It only works once the round is settled, the escrow is empty, and every card is closed, or 24 h after the end. Leftover cards stay closable by anyone, rent to their player.</p>
+      <h3>Host key rotation</h3>
+      <p>The program reads the host from its config account. <code>set_admin</code> (instruction 10) swaps it and needs signatures from <b>both</b> the current and the new key, so a typo can't lock the config. Procedure: generate the new key offline → sign <code>set_admin(old, new)</code> with both → check the config account → restart the server with the new <code>ZK_HOST_KEY</code> → retire the old key. Open rounds keep settling, because every instruction checks the config, not a hard-coded key.</p>
+      <h3>Trusted setup</h3>
+      <p>Phase 1 is the public Perpetual Powers of Tau (80 contributions, power 10). Phase 2 for our circuit had three independent contributions plus a final beacon: the blockhash of Solana mainnet slot 458,674,048, committed to before the first contribution. The transcript and the <code>snarkjs zkey verify</code> output are in <code>docs/ceremony/</code>. To be clear, <b>all three phase-2 contributions were made by the ZKdle team</b>. We'll open a public round so anyone can add theirs.</p>
+      <h3>Residual risks, plainly</h3>
+      <ul class="rules">
+        <li><b>The operator sees live answers.</b> The server has to know a word to prove clues about it. ZK stops us from swapping the answer or forging a hint; it doesn't stop us from knowing.</li>
+        <li><b>A server breach could leak live answers</b> for rounds in progress. The pot cap and the 12-seat beta bound what that is worth.</li>
+        <li><b>Daily proofs aren't bound to a wallet</b>, so a Daily clue can be replayed by someone else. The Daily is free; round and duel seats each have their own seal.</li>
+        <li><b>Next:</b> sealing inside a TEE or with threshold keys, so no single operator holds a live word.</li>
+      </ul>
+    </section>
+
+    <section id="wallets"><h2>Public wallets</h2>
+      <p>Test results, including a devnet run with explorer links: <a href="https://github.com/zkdle/zkdle/blob/main/docs/test-report.md" target="_blank" rel="noopener">docs/test-report.md</a>.</p>
+      <p>Every wallet that touches ZKdle on mainnet is public, so anyone can watch it.</p>
+      <table class="nums ex wallets"><thead><tr><th>Role</th><th>Address</th><th>What it does</th></tr></thead><tbody>
+        <tr><th>Treasury</th><td><a href="https://solscan.io/account/FuRUWehSQyB8EaMy5t8SRmYhKZEc8cBpYWBXripikXW6" target="_blank" rel="noopener"><code>FuRUWehSQyB8EaMy5t8SRmYhKZEc8cBpYWBXripikXW6</code></a></td><td>Receives the 5% fee from bounty entries (and from duel payouts). Its key is never on the server; the program only pays it the computed fee.</td></tr>
+        <tr><th>Host</th><td><a href="https://solscan.io/account/FYY8DXRz2ZvirwQxJqgkfrjftDH3Bsfpn9AyQwm5evvU" target="_blank" rel="noopener"><code>FYY8DXRz2ZvirwQxJqgkfrjftDH3Bsfpn9AyQwm5evvU</code></a></td><td>The server's signer: opens days and rounds, co-signs seats, reveals and settles, and pays fees and rent, which <code>close_round</code> gives back. It can't move escrow anywhere except the payout the program computes. It can be rotated with <code>set_admin</code>.</td></tr>
+        <tr><th>Deployer</th><td><a href="https://solscan.io/account/A79M6eVude5szKrAX1M9ppRkti7Bx6P1evyYeFKWJe4Z" target="_blank" rel="noopener"><code>A79M6eVude5szKrAX1M9ppRkti7Bx6P1evyYeFKWJe4Z</code></a></td><td>Deploys the program. It holds the upgrade authority until that moves to a multisig.</td></tr>
+        <tr><th>Program (mainnet)</th><td><a href="https://solscan.io/account/4fCcuHmPEfyVu8AtEWE1CtFoLyUrh8S58SS471JDGLtu" target="_blank" rel="noopener"><code>4fCcuHmPEfyVu8AtEWE1CtFoLyUrh8S58SS471JDGLtu</code></a></td><td>The ZKdle program: verifier, escrow, payouts. Verified build. Config account <a href="https://solscan.io/account/J2sBh74Fma5NBEeqwdsJKLcSswqsVM36DjFfLpnSbgd6" target="_blank" rel="noopener"><code>J2sB…bgd6</code></a> holds the host, treasury and 5% fee.</td></tr>
+        <tr><th>$PROOF mint</th><td>added at token launch</td><td>The bounty entry token.</td></tr>
+      </tbody></table>
+      <p><strong>Verified build.</strong> The mainnet program is built reproducibly with <code>solana-verify</code> and verified against the public GitHub source by OtterSec: <a href="https://verify.osec.io/status/4fCcuHmPEfyVu8AtEWE1CtFoLyUrh8S58SS471JDGLtu" target="_blank" rel="noopener">verification status</a> · <a href="https://solscan.io/account/4fCcuHmPEfyVu8AtEWE1CtFoLyUrh8S58SS471JDGLtu#security" target="_blank" rel="noopener">Solscan</a>. It also carries a <code>security.txt</code> with contacts and the <a href="https://github.com/zkdle/zkdle/blob/main/SECURITY.md" target="_blank" rel="noopener">security policy</a>.</p>
+      <p><strong>Upgrade authority.</strong> The program is upgradeable. The upgrade authority is currently the deployer wallet above; the plan is to move it to a multisig once early access settles. Any upgrade is public on-chain and shows as unverified until it is re-verified against the source.</p>
+    </section>
+
+    <section id="roadmap"><h2>Early access</h2>
+      <figure><img src="/img/docs/roadmap.png" alt="Capacity roadmap" loading="lazy"></figure>
+      <p>Bounty rounds start at <b>12 players per round</b> while we test in public. That is what a single settle transaction pays out comfortably today. Capacity goes up step by step as the upgrades ship: <b>Phase 2</b> (~100 per round) brings an incremental on-chain leaderboard, so settlement no longer needs every seat in one transaction, plus dedicated prover workers. <b>Phase 3</b> (200+) runs rounds in parallel. No dates promised; each step ships once it has been tested on devnet, and the rules above don’t change.</p>
+    </section>
+  </article>
+</main>
+<footer class="foot">
+  <div class="foot-big" aria-hidden="true">ZKdle</div>
+  <div class="foot-row">
+    <a class="mark" href="/"><img class="mark-seal" src="/brand/seal.svg" alt="" width="38" height="38"><span>ZKdle</span></a>
+    <p data-t="foot.made">Open source. MIT licensed.</p>
+    <div class="foot-links"><a data-link="x" href="#" target="_blank" rel="noopener">X · @zkdlefun</a><a href="/docs">Docs</a><a data-link="github" href="#" target="_blank" rel="noopener">GitHub</a><button class="sound" type="button"><span class="eq"><i></i><i></i><i></i></span><span data-t="foot.sound">sound</span> <i>off</i></button></div>
+  </div>
+  <p class="net"></p>
+</footer>
+<script src="/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Play · ZKdle</title>
+<meta name="description" content="Today's sealed word. Every clue carries a zero-knowledge proof.">
+<meta property="og:title" content="ZKdle — proven clues, sealed words">
+<!--og-->
+<meta name="theme-color" content="#f4ecdc">
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/brand/favicon-16.png" sizes="16x16">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/play.css">
+</head>
+<body class="game">
+<div class="paper" aria-hidden="true"></div>
+<header class="top">
+  <a class="mark" href="/"><img class="mark-seal" src="/brand/seal.svg" alt="" width="38" height="38"><span>ZKdle</span></a>
+  <nav class="tabs" role="tablist">
+    <button data-tab="daily" class="on" data-t="tab.daily">Daily</button>
+    <button data-tab="bounty" data-t="tab.bounty">Bounty</button>
+    <button data-tab="duel" data-t="tab.duel">Duel</button>
+  </nav>
+  <div class="tools">
+    <a class="ico" data-link="x" href="#" aria-label="X" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.8 3h3.1l-6.8 7.7 8 10.3h-6.2l-4.9-6.3L5.4 21H2.3l7.2-8.3L1.8 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg></a>
+    <a class="ico" data-link="github" href="#" aria-label="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.6.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.5 9.5 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></a>
+    <button class="wallet" type="button" data-t="wallet.connect">Connect</button>
+  </div>
+</header>
+
+<main class="table">
+  <aside class="side left">
+    <div class="ticket" id="info"></div>
+  </aside>
+  <section class="play">
+    <div class="status hand" id="status"></div>
+    <div class="board" id="board"></div>
+    <div class="keys" id="keys"></div>
+  </section>
+  <aside class="side right">
+    <div class="ledger-card" id="panel"></div>
+  </aside>
+</main>
+
+<div class="sheet" id="sheet" hidden><div class="sheet-in"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<footer class="foot mini"><span class="net"></span><button class="sound" type="button"><span data-t="foot.sound">sound</span> <i>off</i></button></footer>
+<script src="/play.js" defer></script>
+</body>
+</html>

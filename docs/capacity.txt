@@ -1,0 +1,1 @@
+12-seat $PROOF settle: 1200/1232 bytes, 40823 compute units, 33 accounts (local validator)

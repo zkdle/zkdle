@@ -1,0 +1,13 @@
+node_modules/
+data.json
+data.json.tmp
+.env
+*.log
+program/target/
+zk/pf.ptau
+zk/*.ptau
+*-keypair.json
+id.json
+zk/ceremony/*.ptau
+docs/audit/*.png
+zk/ceremony/final.zkey

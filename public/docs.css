@@ -1,0 +1,30 @@
+.doc { display: grid; gap: 40px; padding: 120px var(--pad) 100px; max-width: 1240px; margin: 0 auto; }
+@media (min-width: 1000px) { .doc { grid-template-columns: 220px 1fr; gap: 70px; } .toc { position: sticky; top: 100px; align-self: start; } }
+.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; }
+.toc li { counter-increment: t; padding: 7px 0; border-top: 1px solid rgba(34,48,74,.12); font-size: 15px; }
+.toc li::before { content: counter(t, decimal-leading-zero) '  '; font: italic 400 14px var(--display); color: var(--wax); }
+.toc a { text-decoration: none; color: var(--ink-soft); } .toc a:hover { color: var(--wax); }
+@media (max-width: 999px) { .toc { display: none; } }
+.prose { min-width: 0; }
+.doc-head h1 { font-size: clamp(52px, 8vw, 112px); font-weight: 340; letter-spacing: -.05em; margin-bottom: 20px; }
+.prose section { padding-top: 70px; scroll-margin-top: 80px; }
+.prose h2 { font-size: clamp(36px, 4.6vw, 64px); }
+.prose h3 { font-size: 26px; }
+.prose p, .prose li { color: var(--ink-soft); max-width: 46em; }
+.prose b { color: var(--ink); font-weight: 600; }
+.prose code { font: 500 .88em var(--body); background: var(--paper-2); padding: 2px 8px; border-radius: 99px; color: var(--ink); }
+.prose figure { margin: 26px 0; }
+.prose figure img { width: 100%; height: auto; display: block; border-radius: 22px; box-shadow: 0 1px 0 rgba(34,48,74,.08), 0 30px 60px -40px rgba(60,40,20,.55); }
+.prose figure.shot img { border: 1px solid rgba(34,48,74,.1); }
+.rules { list-style: none; padding: 0; margin: 0; }
+.rules li { position: relative; padding: 12px 0 12px 30px; border-top: 1px solid rgba(34,48,74,.12); }
+.rules li::before { content: '✺'; position: absolute; left: 0; top: 12px; color: var(--wax); font-size: 14px; }
+.nums { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 15px; }
+.nums th, .nums td { text-align: left; padding: 12px 14px 12px 0; border-top: 1px solid rgba(34,48,74,.14); vertical-align: top; color: var(--ink-soft); }
+.nums th { font: 500 12px var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--wax); width: 30%; }
+.nums.ex thead th { width: auto; }
+.nums.ex td:first-child { color: var(--ink); }
+.prose .ex, .prose .nums { display: block; overflow-x: auto; }
+.two { display: grid; gap: 30px; } @media (min-width: 800px) { .two { grid-template-columns: 1fr 1fr; } }
+.small { font-size: 14px; color: var(--ink-faint); }
+.wallets code { word-break: break-all; font-size: 12px; } .wallets td:last-child { min-width: 16em; }
