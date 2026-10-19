@@ -198,7 +198,7 @@ async function refreshSide() {
       <div class="stats"><div><b>${s.cur}</b><span>${t('g.streak')}</span></div><div><b>${s.best}</b><span>${t('g.best')}</span></div><div><b>${s.solves}</b><span>${t('g.solves')}</span></div></div>
       ${chain}
       ${game.done ? `<div class="actions"><button class="btn wax" id="share">${t('g.share')}</button>${game.board ? `<button class="btn ghost" id="sealrun">${t('g.sealrun')}</button>` : ''}</div>` : ''}
-      ${cfg.token?.mint ? `<button class="mini-btn" id="mend">${t('g.mend')} · ${cfg.token.mend} $${cfg.token.symbol}</button>` : `<p class="small muted" data-pending="mend">${t('g.mend')} (burn ${cfg.token?.mend || 500} $${cfg.token?.symbol || 'PROOF'}) · available after $PROOF launches</p>`}`;
+      ${cfg.token?.mint ? `<button class="mini-btn" id="mend">${t('g.mend')} · ${Number(cfg.token.mend ?? 10000).toLocaleString('en-US')} $${cfg.token.symbol}</button>` : `<p class="small muted" data-pending="mend">${t('g.mend')} (burn ${Number(cfg.token?.mend ?? 10000).toLocaleString('en-US')} $${cfg.token?.symbol || 'PROOF'}) · available after $PROOF launches</p>`}`;
     $('#share')?.addEventListener('click', share);
     $('#sealrun')?.addEventListener('click', sealRun);
     $('#mend')?.addEventListener('click', mend);
