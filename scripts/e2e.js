@@ -63,7 +63,7 @@ async function main() {
   const players = Array.from({ length: 5 }, () => web3.Keypair.generate());
   const pid = programKp.publicKey.toBase58();
 
-  const v = spawn('solana-test-validator', ['--reset', '--quiet', '--ledger', path.join(tmp, 'ledger'), '--rpc-port', String(RPC_PORT), '--faucet-port', String(RPC_PORT + 2), '--bpf-program', pid, SO], { stdio: 'ignore' });
+  const v = spawn('solana-test-validator', ['--reset', '--quiet', '--ledger', path.join(tmp, 'ledger'), '--rpc-port', String(RPC_PORT), '--faucet-port', String(RPC_PORT + 2), '--gossip-port', String(RPC_PORT + 3), '--dynamic-port-range', `${RPC_PORT + 100}-${RPC_PORT + 160}`, '--bpf-program', pid, SO], { stdio: 'ignore' });
   kids.push(v);
   const conn = new web3.Connection(RPC, 'confirmed');
   for (let i = 0; i < 60; i++) { try { await conn.getSlot(); break; } catch { await sleep(500); } }
@@ -378,16 +378,16 @@ async function main() {
     const ata = { address: ataOf(A) };
     const t0 = await tokBal(ata.address);
     const s0 = readStreak((await conn.getAccountInfo(prog.at.streak(A.publicKey))).data);
-    await send([spl.burn(ata.address, mint, A.publicKey, 500e6, 6, TPX), prog.mend(A.publicKey, host.publicKey)], [A, host]);
+    await send([spl.burn(ata.address, mint, A.publicKey, 10_000e6, 6, TPX), prog.mend(A.publicKey, host.publicKey)], [A, host]);
     const s1 = readStreak((await conn.getAccountInfo(prog.at.streak(A.publicKey))).data);
     assert.equal(s1.lastDay, s0.lastDay + 1); assert.equal(s1.mends, 1);
-    assert.equal(t0 - (await tokBal(ata.address)), 500e6);
+    assert.equal(t0 - (await tokBal(ata.address)), 10_000e6);
     await rejects(send([prog.mend(A.publicKey, players[3].publicKey)], [A, players[3]]), 'mend without host');
   });
 
-  await step('holder badge: 100,000 $PROOF threshold read from the chain (works for Token and Token-2022)', async () => {
+  await step('holder badge: 1,000,000 $PROOF threshold read from the chain (works for Token and Token-2022)', async () => {
     const rich = web3.Keypair.generate(), poor = web3.Keypair.generate();
-    for (const [k, amt] of [[rich, 100_000e6], [poor, 99_999e6]]) { const a = await splt.getOrCreateAssociatedTokenAccount(conn, host, mint, k.publicKey); await splt.mintTo(conn, host, mint, a.address, host, amt); }
+    for (const [k, amt] of [[rich, 1_000_000e6], [poor, 999_999e6]]) { const a = await splt.getOrCreateAssociatedTokenAccount(conn, host, mint, k.publicKey); await splt.mintTo(conn, host, mint, a.address, host, amt); }
     assert.equal((await api(`/api/player/${rich.publicKey.toBase58()}`)).holder, true);
     assert.equal((await api(`/api/player/${poor.publicKey.toBase58()}`)).holder, false);
   });

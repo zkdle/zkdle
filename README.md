@@ -29,7 +29,7 @@ Full rules with every number: **[zkdle.fun/docs](https://zkdle.fun/docs)**.
 - One word for everyone, six tries. Free, and no wallet needed (sealing a run on-chain costs only Solana fees and account rent).
 - Proofs are checked in the browser. “Seal my run” puts every row on-chain, and your streak lives in your own PDA.
 - New word at 00:00 UTC. Yesterday’s word and salt are published.
-- Streak repair: burn 500 $PROOF to bridge exactly one missed day.
+- Streak repair: burn 10,000 $PROOF to bridge exactly one missed day.
 
 ### Bounty rounds (paid in $PROOF)
 
@@ -101,8 +101,8 @@ Proofs run single-threaded through a global queue (`ZK_PROVE_CONCURRENCY`, defau
 ## $PROOF
 
 - **Bounty entries:** 10% of every entry is burned.
-- **Streak repair:** burn 500 $PROOF.
-- **Holder frame:** wallets with ≥ 100,000 $PROOF get a gold frame and a Pf holder badge on share cards.
+- **Streak repair:** burn 10,000 $PROOF.
+- **Holder frame:** wallets with ≥ 1,000,000 $PROOF get a gold frame and a Pf holder badge on share cards.
 - **Treasury:** 5% of each entry goes to a public treasury token account.
 
 `ZK_TOKEN_MINT` empty → the site says “not launched yet” and bounty shows “opens at token launch”.

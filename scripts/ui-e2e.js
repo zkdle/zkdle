@@ -26,7 +26,7 @@ const step = async (name, fn) => {
 async function main() {
   const programKp = web3.Keypair.generate(), host = web3.Keypair.generate(), treasury = web3.Keypair.generate();
   const pid = programKp.publicKey.toBase58();
-  kids.push(spawn('solana-test-validator', ['--reset', '--quiet', '--ledger', path.join(tmp, 'ledger'), '--rpc-port', String(RPC_PORT), '--faucet-port', String(RPC_PORT + 2), '--bpf-program', pid, path.join(ROOT, 'program/target/deploy/zkdle.so')], { stdio: 'ignore' }));
+  kids.push(spawn('solana-test-validator', ['--reset', '--quiet', '--ledger', path.join(tmp, 'ledger'), '--rpc-port', String(RPC_PORT), '--faucet-port', String(RPC_PORT + 2), '--gossip-port', String(RPC_PORT + 3), '--dynamic-port-range', `${RPC_PORT + 100}-${RPC_PORT + 160}`, '--bpf-program', pid, path.join(ROOT, 'program/target/deploy/zkdle.so')], { stdio: 'ignore' }));
   const conn = new web3.Connection(RPC, 'confirmed');
   for (let i = 0; i < 60; i++) { try { await conn.getSlot(); break; } catch { await sleep(500); } }
   const A = web3.Keypair.generate(), B = web3.Keypair.generate();

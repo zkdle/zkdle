@@ -67,7 +67,7 @@ function extensions(d) {
     console.log('price           ', (lamportsPerToken / 1e9).toExponential(4), 'SOL per token');
     const entry = 0.01e9 / price / 10 ** decimals;
     console.log('0.01 SOL entry  ', Math.round(entry).toLocaleString('en-US'), 'tokens');
-    console.log('mend 500 tokens ≈', (500 * lamportsPerToken / 1e9).toFixed(6), 'SOL; holder 100k ≈', (1e5 * lamportsPerToken / 1e9).toFixed(4), 'SOL');
+    console.log('mend 10,000 tokens ≈', (1e4 * lamportsPerToken / 1e9).toFixed(6), 'SOL; holder 1M ≈', (1e6 * lamportsPerToken / 1e9).toFixed(4), 'SOL');
   }
   console.log('\n# Render env to set (non-secret):');
   console.log('ZK_TOKEN_MINT=' + mint.toBase58());

@@ -37,7 +37,7 @@ Generated 2026-10-19, pre-launch audit against the verified build (`05321b14…7
 - close_round: the server closes cards and the round by itself after settle (bounty + duel)
 - server restart mid-round: encrypted state survives, the seat keeps playing
 - security: pot cap refuses seats past ZK_MAX_POT_SOL_EQUIV
-- holder badge: 100,000 $PROOF threshold read from the chain (Token and Token-2022)
+- holder badge: 1,000,000 $PROOF threshold read from the chain (Token and Token-2022)
 - host rotation: set_admin needs both keys, then the config points at the new host
 
 ## Devnet run (exact verified build)
